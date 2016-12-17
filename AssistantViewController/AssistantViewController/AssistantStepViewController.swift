@@ -16,7 +16,7 @@ public protocol AssistantStepViewControllerProtocol: class {
 
 public extension AssistantStepViewControllerProtocol where Self: UIViewController {
     var assistantViewController: AssistantViewController? {
-        return self.navigationController?.parentViewController as? AssistantViewController
+        return self.navigationController?.parent as? AssistantViewController
     }
     
     var headerViewController: UIViewController? {
@@ -25,10 +25,10 @@ public extension AssistantStepViewControllerProtocol where Self: UIViewControlle
 }
 
 public class AssistantStepViewController: UIViewController, AssistantStepViewControllerProtocol {
-    @IBAction func pushNextStepViewController(sender: AnyObject?) {
-        self.assistantViewController?.pushNextViewController()
+    @IBAction func pushNextStepViewController(_ sender: Any) {
+        _ = self.assistantViewController?.pushNextViewController()
     }
-    @IBAction func popToPreviousStepViewController(sender: AnyObject?) {
-        self.assistantViewController?.popToPreviousViewController()
+    @IBAction func popToPreviousStepViewController(_ sender: Any) {
+        _ = self.assistantViewController?.popToPreviousViewController()
     }
 }

@@ -21,14 +21,14 @@ class SetupHeaderViewController: UIViewController, AssistantStepViewControllerPr
     }
     
     // MARK: - Life Cycle
-    override func viewWillAppear(animated: Bool) {
+    override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         
         self.progressView?.setProgress(Float(self.progress), animated: false)
     }
     
     // MARK: - Actions
-    @IBAction func toggleDetails(sender: AnyObject?) {
+    @IBAction func toggleDetails(_ sender: Any) {
         if self.assistantViewController?.preferredPrimaryViewControllerHeight != 200.0 {
             self.assistantViewController?.setPreferredPrimaryViewControllerHeight(200.0, animated: true)
         } else {

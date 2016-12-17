@@ -9,10 +9,10 @@
 import UIKit
 
 public protocol AssistantViewControllerDelegate: class {
-    func assistantViewController(controller: AssistantViewController, willShow viewController: UIViewController, animated: Bool)
-    func assistantViewController(controller: AssistantViewController, didShow viewController: UIViewController, animated: Bool)
+    func assistantViewController(_ controller: AssistantViewController, willShow viewController: UIViewController, animated: Bool)
+    func assistantViewController(_ controller: AssistantViewController, didShow viewController: UIViewController, animated: Bool)
 }
 
 public protocol AssistantViewControllerDataSource: class {
-    func assistantViewControllerViewControllerForNextStep(controller: AssistantViewController) -> UIViewController?
+    func assistantViewControllerViewControllerForNextStep(_ controller: AssistantViewController) -> UIViewController?
 }

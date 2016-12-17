@@ -20,7 +20,7 @@ private enum Storyboard: String {
     }
     
     var viewController: UIViewController {
-        return self.storyboard.instantiateViewControllerWithIdentifier(self.rawValue)
+        return self.storyboard.instantiateViewController(withIdentifier: self.rawValue)
     }
 }
 
@@ -32,23 +32,22 @@ class ViewController: UIViewController {
     }
     
     // MARK: - Actions
-    @IBAction func showAssistantViewController(sender: UIButton?) {
-        
+    @IBAction func showAssistantViewController(_ sender: UIButton?) {
         let viewController = Storyboard.SetupHeaderViewController.viewController
-        let a = AssistantViewController(primaryViewController: viewController)
-        a.dataSource = self
-        a.delegate = self
+        let assistantViewController = AssistantViewController(primaryViewController: viewController)
+        assistantViewController.dataSource = self
+        assistantViewController.delegate = self
         
-        self.presentViewController(a, animated: true, completion: nil)
+        self.present(assistantViewController, animated: true, completion: nil)
     }
     
-    @IBAction func finishAssistant(segue: UIStoryboardSegue?) {
-        segue?.sourceViewController.dismissViewControllerAnimated(true, completion: nil)
+    @IBAction func finishAssistant(_ segue: UIStoryboardSegue?) {
+        segue?.source.dismiss(animated: true, completion: nil)
     }
 }
 
 extension ViewController: AssistantViewControllerDelegate {
-    func assistantViewController(controller: AssistantViewController, willShow viewController: UIViewController, animated: Bool) {
+    func assistantViewController(_ controller: AssistantViewController, willShow viewController: UIViewController, animated: Bool) {
         let header = (controller.primaryViewController as? UINavigationController)?.topViewController as? SetupHeaderViewController
         
         switch viewController.view.tag {
@@ -63,11 +62,11 @@ extension ViewController: AssistantViewControllerDelegate {
         }
     }
     
-    func assistantViewController(controller: AssistantViewController, didShow viewController: UIViewController, animated: Bool) {}
+    func assistantViewController(_ controller: AssistantViewController, didShow viewController: UIViewController, animated: Bool) {}
 }
 
 extension ViewController: AssistantViewControllerDataSource {
-    func assistantViewControllerViewControllerForNextStep(controller: AssistantViewController) -> UIViewController? {
+    func assistantViewControllerViewControllerForNextStep(_ controller: AssistantViewController) -> UIViewController? {
         guard let tag = controller.currentStepViewController?.view.tag else {
             return Storyboard.FirstStepViewController.viewController
         }

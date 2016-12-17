@@ -9,7 +9,7 @@
 import UIKit
 
 private let defaultHeaderHeight: CGFloat = 104.0
-private let animationDuration: NSTimeInterval = 0.3
+private let animationDuration: TimeInterval = 0.3
 
 public final class AssistantViewController: UIViewController {
     
@@ -23,11 +23,11 @@ public final class AssistantViewController: UIViewController {
         return self.stepsNavigationController.topViewController
     }
     
-    private var stepsNavigationController: UINavigationController!
+    fileprivate var stepsNavigationController: UINavigationController!
     
-    private var primaryViewControllerHeaderConstraint: NSLayoutConstraint!
+    fileprivate var primaryViewControllerHeaderConstraint: NSLayoutConstraint!
     
-    private var _preferredPrimaryViewControllerHeight: CGFloat = defaultHeaderHeight {
+    fileprivate var _preferredPrimaryViewControllerHeight: CGFloat = defaultHeaderHeight {
         didSet {
             self.primaryViewControllerHeaderConstraint.constant = _preferredPrimaryViewControllerHeight
         }
@@ -42,11 +42,11 @@ public final class AssistantViewController: UIViewController {
         }
     }
     
-    public func setPreferredPrimaryViewControllerHeight(height: CGFloat, animated: Bool) {
-        UIView.animateWithDuration(animationDuration) {
+    public func setPreferredPrimaryViewControllerHeight(_ height: CGFloat, animated: Bool) {
+        UIView.animate(withDuration: animationDuration, animations: {
             self._preferredPrimaryViewControllerHeight = height
             self.view.layoutIfNeeded()
-        }
+        }) 
     }
     
     // MARK: - Life Cycle
@@ -57,7 +57,7 @@ public final class AssistantViewController: UIViewController {
     }
     
     public required init?(coder aDecoder: NSCoder) {
-        self.primaryViewController = aDecoder.decodeObjectForKey("PrimaryViewController") as! UIViewController
+        self.primaryViewController = aDecoder.decodeObject(forKey: "PrimaryViewController") as! UIViewController
         super.init(coder: aDecoder)
     }
     
@@ -66,24 +66,27 @@ public final class AssistantViewController: UIViewController {
         self.configureChildViewControllers()
     }
     
-    public override func childViewControllerForStatusBarStyle() -> UIViewController? {
+    public override var childViewControllerForStatusBarStyle: UIViewController? {
         return self.primaryViewController
     }
     
-    public override func childViewControllerForStatusBarHidden() -> UIViewController? {
+    public override var childViewControllerForStatusBarHidden: UIViewController? {
         return self.primaryViewController
     }
     
     // MARK: - Transitioning
-    public func pushNextViewController(animated animated: Bool = true) -> UIViewController? {
+    @discardableResult
+    public func pushNextViewController(animated: Bool = true) -> UIViewController? {
         guard let nextViewController = self.dataSource?.assistantViewControllerViewControllerForNextStep(self) else {
             return nil
         }
         self.stepsNavigationController.pushViewController(nextViewController, animated: animated)
         return nextViewController
     }
-    public func popToPreviousViewController(animated animated: Bool = true) -> UIViewController? {
-        return self.stepsNavigationController.popViewControllerAnimated(animated)
+    
+    @discardableResult
+    public func popToPreviousViewController(animated: Bool = true) -> UIViewController? {
+        return self.stepsNavigationController.popViewController(animated: animated)
     }
 }
 
@@ -93,19 +96,19 @@ private extension AssistantViewController {
         let top = self.primaryViewController
         self.addChildViewController(top)
         self.view.addSubview(top.view)
-        top.didMoveToParentViewController(self)
+        top.didMove(toParentViewController: self)
         
         let navController = UINavigationController(navigationBarClass: nil, toolbarClass: nil)
         self.addChildViewController(navController)
-        navController.navigationBarHidden = true
-        navController.toolbarHidden = true
+        navController.isNavigationBarHidden = true
+        navController.isToolbarHidden = true
         navController.delegate = self
         if let pop = navController.interactivePopGestureRecognizer {
             self.view.addGestureRecognizer(pop)
         }
         self.stepsNavigationController = navController
         self.view.addSubview(navController.view)
-        navController.didMoveToParentViewController(self)
+        navController.didMove(toParentViewController: self)
         
         self.configurePrimaryConstraints()
         self.configureFirstStepViewController()
@@ -115,29 +118,29 @@ private extension AssistantViewController {
         let top = self.primaryViewController.view
         let bottom = self.stepsNavigationController.view
         
-        top.translatesAutoresizingMaskIntoConstraints = false
-        top.topAnchor.constraintEqualToAnchor(self.view.topAnchor).active = true
-        top.leadingAnchor.constraintEqualToAnchor(self.view.leadingAnchor).active = true
-        top.trailingAnchor.constraintEqualToAnchor(self.view.trailingAnchor).active = true
-        top.bottomAnchor.constraintEqualToAnchor(bottom.topAnchor).active = true
+        top?.translatesAutoresizingMaskIntoConstraints = false
+        top?.topAnchor.constraint(equalTo: self.view.topAnchor).isActive = true
+        top?.leadingAnchor.constraint(equalTo: self.view.leadingAnchor).isActive = true
+        top?.trailingAnchor.constraint(equalTo: self.view.trailingAnchor).isActive = true
+        top?.bottomAnchor.constraint(equalTo: (bottom?.topAnchor)!).isActive = true
         
         let heightConstraint = NSLayoutConstraint(
-            item: top,
-            attribute: .Height,
-            relatedBy: .Equal,
+            item: top as Any,
+            attribute: .height,
+            relatedBy: .equal,
             toItem: nil,
-            attribute: .NotAnAttribute,
+            attribute: .notAnAttribute,
             multiplier: 1.0,
             constant: self.preferredPrimaryViewControllerHeight
         )
         heightConstraint.priority = UILayoutPriorityFittingSizeLevel
         self.primaryViewControllerHeaderConstraint = heightConstraint
-        top.addConstraint(heightConstraint)
+        top?.addConstraint(heightConstraint)
         
-        bottom.translatesAutoresizingMaskIntoConstraints = false
-        bottom.leadingAnchor.constraintEqualToAnchor(self.view.leadingAnchor).active = true
-        bottom.trailingAnchor.constraintEqualToAnchor(self.view.trailingAnchor).active = true
-        bottom.bottomAnchor.constraintEqualToAnchor(self.view.bottomAnchor).active = true
+        bottom?.translatesAutoresizingMaskIntoConstraints = false
+        bottom?.leadingAnchor.constraint(equalTo: self.view.leadingAnchor).isActive = true
+        bottom?.trailingAnchor.constraint(equalTo: self.view.trailingAnchor).isActive = true
+        bottom?.bottomAnchor.constraint(equalTo: self.view.bottomAnchor).isActive = true
     }
     
     func configureFirstStepViewController() {
@@ -151,11 +154,11 @@ private extension AssistantViewController {
 }
 
 extension AssistantViewController: UINavigationControllerDelegate {
-    public func navigationController(navigationController: UINavigationController, willShowViewController viewController: UIViewController, animated: Bool) {
+    public func navigationController(_ navigationController: UINavigationController, willShow viewController: UIViewController, animated: Bool) {
         self.delegate?.assistantViewController(self, willShow: viewController, animated: animated)
     }
     
-    public func navigationController(navigationController: UINavigationController, didShowViewController viewController: UIViewController, animated: Bool) {
+    public func navigationController(_ navigationController: UINavigationController, didShow viewController: UIViewController, animated: Bool) {
         self.delegate?.assistantViewController(self, didShow: viewController, animated: animated)
     }
 }
